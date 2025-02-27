@@ -95,3 +95,4 @@
 /Users/shahadjeza/Documents/ELM_training/TechJobPortal/obj/Debug/net9.0/TechJobPortal.pdb
 /Users/shahadjeza/Documents/ELM_training/TechJobPortal/obj/Debug/net9.0/TechJobPortal.genruntimeconfig.cache
 /Users/shahadjeza/Documents/ELM_training/TechJobPortal/obj/Debug/net9.0/ref/TechJobPortal.dll
+/Users/shahadjeza/Documents/ELM_training/TechJobPortal/obj/Debug/net9.0/TechJobPortal.sourcelink.json
