@@ -4,38 +4,178 @@
     ViewData["Title"] = "Job Listings";
 }
 
-<h2>Job Listings</h2>
+<style>
+    /* CSS Animations */
+    .job-row {
+        transition: all 0.3s ease;
+    }
+    
+    .job-row:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        background-color: #f8f9fa;
+    }
+    
+    .filter-container {
+        animation: fadeIn 0.5s ease-in-out;
+    }
+    
+    .btn-filter {
+        transition: all 0.2s ease;
+    }
+    
+    .btn-filter:hover {
+        transform: scale(1.05);
+    }
+    
+    .page-title {
+        position: relative;
+        display: inline-block;
+    }
+    
+    .page-title:after {
+        content: '';
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: -5px;
+        left: 0;
+        background-color: #007bff;
+        transition: width 0.3s ease;
+    }
+    
+    .page-title:hover:after {
+        width: 100%;
+    }
+    
+    .search-box {
+        transition: all 0.3s ease;
+    }
+    
+    .search-box:focus {
+        box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+        transform: scale(1.01);
+    }
+</style>
 
-<div class="mb-3">
-    <a asp-action="Index" asp-route-sortOrder="newest" class="btn btn-primary">Sort by Newest</a>
-    <a asp-action="Index" asp-route-sortOrder="oldest" class="btn btn-secondary">Sort by Oldest</a>
+<div class="container">
+    <h2 class="page-title mb-4">Job Listings</h2>
+
+    <div class="row filter-container mb-4">
+        <div class="col-md-8">
+            <form asp-action="Index" method="get" class="form-inline">
+                <div class="input-group mb-2 mr-sm-2">
+                    <input type="text" name="searchString" value="@ViewData["CurrentFilter"]" class="form-control search-box" placeholder="Search by title or company..." />
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-search"></i> Search
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="input-group mb-2 mr-sm-2">
+                    <select name="jobType" class="form-control" asp-items="ViewBag.JobTypes" onchange="this.form.submit()">
+                        <option value="">All Job Types</option>
+                    </select>
+                </div>
+                
+                <input type="hidden" name="sortOrder" value="@ViewData["CurrentSort"]" />
+                
+                <button type="button" class="btn btn-outline-secondary mb-2" onclick="clearFilters()">
+                    <i class="bi bi-x-circle"></i> Clear Filters
+                </button>
+            </form>
+        </div>
+        <div class="col-md-4 text-right">
+            <div class="btn-group" role="group">
+                <a asp-action="Index" asp-route-sortOrder="newest" asp-route-searchString="@ViewData["CurrentFilter"]" asp-route-jobType="@ViewData["CurrentJobType"]" class="btn @(ViewData["CurrentSort"]?.ToString() == "newest" ? "btn-primary" : "btn-outline-primary") btn-filter">
+                    <i class="bi bi-sort-down"></i> Newest
+                </a>
+                <a asp-action="Index" asp-route-sortOrder="oldest" asp-route-searchString="@ViewData["CurrentFilter"]" asp-route-jobType="@ViewData["CurrentJobType"]" class="btn @(ViewData["CurrentSort"]?.ToString() == "oldest" ? "btn-primary" : "btn-outline-primary") btn-filter">
+                    <i class="bi bi-sort-up"></i> Oldest
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center">
+            <i class="bi bi-info-circle"></i> No job listings match your criteria. Try adjusting your filters.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="bg-light">
+                    <tr>
+                        <th>Title</th>
+                        <th>Company</th>
+                        <th>Location</th>
+                        <th>Job Type</th>
+                        <th>Posted Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var job in Model)
+                    {
+                        <tr class="job-row">
+                            <td>
+                                <a asp-controller="Job" asp-action="Details" asp-route-id="@job.Id" class="font-weight-bold text-primary">@job.Title</a>
+                            </td>
+                            <td>@job.CompanyName</td>
+                            <td><i class="bi bi-geo-alt"></i> @job.Location</td>
+                            <td>
+                                <span class="badge @GetJobTypeBadgeClass(job.JobType)">
+                                    @job.JobType
+                                </span>
+                            </td>
+                            <td>
+                                <small class="text-muted"><i class="bi bi-calendar"></i> @job.PostedDate.ToString("MMM dd, yyyy")</small>
+                            </td>
+                            <td>
+                                <a asp-action="Edit" asp-route-id="@job.Id" class="btn btn-sm btn-warning">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
 </div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th>Company</th>
-            <th>Location</th>
-            <th>Job Type</th>
-            <th>Posted Date</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var job in Model)
+@functions {
+    public string GetJobTypeBadgeClass(JobType jobType)
+    {
+        return jobType switch
         {
-            <tr>
-                <td>
-                    <a asp-controller="Job" asp-action="Details" asp-route-id="@job.Id">@job.Title</a>
-                </td>
-                <td>@job.CompanyName</td>
-                <td>@job.Location</td>
-                <td>@job.JobType</td>
-                <td>Posted on: @job.PostedDate.ToString("MMM dd, yyyy")</td>
-                <td>
-    <a asp-action="Edit" asp-route-id="@job.Id" class="btn btn-warning">Edit</a>
-</td>
-            </tr>
-        }
-    </tbody>
-</table>
+            JobType.FullTime => "badge-success",
+            JobType.PartTime => "badge-info",
+            JobType.Remote => "badge-primary",
+            JobType.Contract => "badge-warning",
+            JobType.Internship => "badge-secondary",
+            _ => "badge-dark"
+        };
+    }
+}
+
+<script>
+    function clearFilters() {
+        window.location.href = '@Url.Action("Index")';
+    }
+    
+    // Fade in animation for table rows
+    document.addEventListener('DOMContentLoaded', function() {
+        const rows = document.querySelectorAll('.job-row');
+        rows.forEach((row, index) => {
+            row.style.opacity = 0;
+            setTimeout(() => {
+                row.style.opacity = 1;
+            }, 100 * index);
+        });
+    });
+</script>

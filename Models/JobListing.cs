@@ -3,7 +3,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TechJobPortal.Models
 {
-    public enum JobType{FullTime, PartTime, Remote, Contract}
+    public enum JobType{FullTime,
+        PartTime,
+        Remote,
+        Contract,
+        Internship}
 
     public class JobListing
     {

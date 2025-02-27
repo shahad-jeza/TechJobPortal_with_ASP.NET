@@ -1,0 +1,10 @@
+bin/
+obj/
+.vscode/
+*.user
+*.suo
+*.cache
+*.log
+node_modules/
+wwwroot/
+appsettings.*.json
