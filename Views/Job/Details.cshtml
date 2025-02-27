@@ -1,0 +1,32 @@
+@model TechJobPortal.Models.JobListing
+
+@{
+    ViewData["Title"] = "Job Details";
+}
+
+<h2>Job Details</h2>
+
+<table class="table">
+    <tr>
+        <th>Title:</th>
+        <td>@Model.Title</td>
+    </tr>
+    <tr>
+        <th>Company:</th>
+        <td>@Model.CompanyName</td>
+    </tr>
+    <tr>
+        <th>Location:</th>
+        <td>@Model.Location</td>
+    </tr>
+    <tr>
+        <th>Job Type:</th>
+        <td>@Model.JobType</td>
+    </tr>
+    <tr>
+        <th>Posted Date:</th>
+        <td> @Model.PostedDate.ToString("MMM dd, yyyy")</td>
+    </tr>
+</table>
+
+<a asp-action="Index" class="btn btn-primary">Back to Job Listings</a>
